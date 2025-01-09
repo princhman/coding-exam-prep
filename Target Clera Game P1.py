@@ -35,6 +35,9 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     while not GameOver:
         DisplayState(Targets, NumbersAllowed, Score)
         UserInput = input("Enter an expression: ")
+        if UserInput == "QUIT":
+            GameOver = True
+            break
         print()
         if CheckIfUserInputValid(UserInput):
             UserInputInRPN = ConvertToRPN(UserInput)

@@ -1,0 +1,11 @@
+Program source code:
+
+def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
+...
+        UserInput = input("Enter an expression: ")
+        if UserInput == "QUIT":
+            GameOver = True
+            break
+        print()
+        if CheckIfUserInputValid(UserInput):
+...
