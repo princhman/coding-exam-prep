@@ -43,6 +43,12 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+                else:
+                    print("The expression does not evaluate to a target.")
+            else:
+                print("You have used a number that is not in the list of numbers allowed.")
+        else:
+            print("The expression is not a valid infix expression.")
         Score -= 1
         if Targets[0] != -1:
             GameOver = True
@@ -89,7 +95,9 @@ def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNu
             if int(Item) in Temp:
                 Temp.remove(int(Item))
             else:
-                return False            
+                return False
+        else:
+            return False
     return True
 
 def CheckValidNumber(Item, MaxNumber):
@@ -196,7 +204,10 @@ def GetNumberFromUserInput(UserInput, Position):
         return int(Number), Position    
 
 def CheckIfUserInputValid(UserInput):
-    if re.search("^([0-9]+[\\+\\-\\*\\/])+[0-9]+$", UserInput) is not None:
+    if re.search(r"^([0-9]+[\\+\\-\\*\\/])+[0-9]+$", UserInput) is not None:
+        if re.search(r"/\s*0", UserInput) is not None:
+            print("You cannot divide by 0.")
+            return False
         return True
     else:
         return False
