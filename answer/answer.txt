@@ -1,1 +1,6 @@
-test commit.
+Soure code
+
+def UpdateTargets(Targets, TrainingGame, MaxTarget):
+    Targets.pop(0)
+    Targets.append(Targets[-1])
+    ...
