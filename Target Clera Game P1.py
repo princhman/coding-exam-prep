@@ -32,8 +32,12 @@ def Main():
 def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     Score = 0
     GameOver = False
+    received_suggestion = input("Enter y to receive a suggestion: ").lower() == "y"
     while not GameOver:
         DisplayState(Targets, NumbersAllowed, Score)
+        if received_suggestion:
+            suggestions = GenerateEvaluations(NumbersAllowed, Targets)
+            print("Suggestions: ", "\n".join(suggestions))
         UserInput = input("Enter an expression: ")
         print()
         if CheckIfUserInputValid(UserInput):
@@ -50,6 +54,62 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
             Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)        
     print("Game over!")
     DisplayScore(Score)
+
+def GenerateEvaluations(NumbersAllowed, Targets):
+    remaining_list = []
+    def generate_all_variations(lst: list[str]) -> list[list[str]]:
+        if len(lst) == 1:
+            return [lst]
+        
+        return_list = []
+        for i in range(len(lst)):
+            current = lst[i]
+            remaining = lst[:i] + lst[i+1:]
+            if remaining not in remaining_list and len(remaining) > 1:
+                remaining_list.append(remaining)
+            for p in generate_all_variations(remaining):
+                return_list.append([current] + p)
+        return return_list
+
+    def generate_all_combinations(lst: list[str], length: int) -> list[list[str]]:
+        if length == 1:
+            return [[item] for item in lst]
+        
+        return_list = []
+        for i in range(len(lst)):
+            current = lst[i]
+            for p in generate_all_combinations(lst, length - 1):
+                return_list.append([current] + p)
+        return return_list
+            
+
+
+    def get_all_expressions(numbers: list[str], operator_combinations: list[list[str]]) -> list[str]:
+        all_expressions = []
+        for combination in operator_combinations:
+            new_expression = ''.join(sum(zip(numbers, combination + ['']), ()))
+            all_expressions.append(new_expression)
+        return all_expressions
+
+    results = []
+    all_variations = generate_all_variations([str(number) for number in NumbersAllowed])
+    all_variations.extend(remaining_list)
+    all_variations = [list(map(str, variation)) for variation in all_variations]
+    all_combinations = {str(x): generate_all_combinations(["+", "-", "*", "/"], x) for x in range(1, 5)}
+
+    for variation in all_variations:
+        results.extend(get_all_expressions(variation, all_combinations[str(len(variation)-1)]))
+    suggestions = []
+    print(len(results))
+
+    for result in results:
+        result_rpn = ConvertToRPN(result)
+        result_evaluation = EvaluateRPN(result_rpn)
+        if result_evaluation in Targets and result_evaluation != -1:
+            suggestions.append(f"{result} = {result_evaluation}")
+    return suggestions
+    
+
 
 def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
